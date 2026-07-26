@@ -1,0 +1,7 @@
+{
+  "templateId": "${template}_v1",
+  "name": "$template Template",
+  "description": "Template for $template",
+  "version": "1.0.0",
+  "supportedFeatures": []
+}

@@ -1,0 +1,58 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+    
+    <PreferenceCategory app:title="عام">
+        <ListPreference
+            app:key="app_language"
+            app:title="لغة التطبيق"
+            app:entries="@array/language_entries"
+            app:entryValues="@array/language_values"
+            app:defaultValue="auto"
+            app:useSimpleSummaryProvider="true" />
+            
+        <ListPreference
+            app:key="app_theme"
+            app:title="المظهر"
+            app:entries="@array/theme_entries"
+            app:entryValues="@array/theme_values"
+            app:defaultValue="SYSTEM"
+            app:useSimpleSummaryProvider="true" />
+            
+        <Preference
+            app:key="output_path"
+            app:title="مجلد الإخراج"
+            app:summary="/storage/emulated/0/ADDITIONSTOTACHIYOMI/GeneratedExtensions" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="الذكاء الاصطناعي (AI Analysis)">
+        <EditTextPreference
+            app:key="hugging_face_token"
+            app:title="رمز Hugging Face"
+            app:summary="أدخل الرمز لتفعيل التحليل الذكي"
+            app:useSimpleSummaryProvider="true" />
+            
+        <SwitchPreferenceCompat
+            app:key="enable_ai_analysis"
+            app:title="تفعيل التحليل بالذكاء الاصطناعي"
+            app:summary="يحتاج إلى توفر الرمز للعمل"
+            app:defaultValue="false" />
+    </PreferenceCategory>
+    
+    <PreferenceCategory app:title="الإشعارات">
+        <SwitchPreferenceCompat
+            app:key="notifications_build_complete"
+            app:title="إشعارات اكتمال البناء"
+            app:defaultValue="true" />
+            
+        <SwitchPreferenceCompat
+            app:key="notifications_build_error"
+            app:title="إشعارات أخطاء البناء"
+            app:defaultValue="true" />
+    </PreferenceCategory>
+    
+    <PreferenceCategory app:title="حول التطبيق">
+        <Preference
+            app:title="إصدار التطبيق"
+            app:summary="1.0.0" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

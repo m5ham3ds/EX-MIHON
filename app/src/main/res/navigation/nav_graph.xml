@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.example.ui.main.MainFragment"
+        android:label="الرئيسية">
+        <action
+            android:id="@+id/action_main_to_permissions"
+            app:destination="@id/permissionsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/permissionsFragment"
+        android:name="com.example.ui.permissions.PermissionsFragment"
+        android:label="تحليل الموقع">
+        <argument
+            android:name="targetUrl"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_permissions_to_progress"
+            app:destination="@id/progressFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/progressFragment"
+        android:name="com.example.ui.progress.ProgressFragment"
+        android:label="بناء الإضافة">
+        <argument
+            android:name="extensionConfig"
+            app:argType="com.example.domain.model.ExtensionConfig" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.ui.settings.SettingsFragment"
+        android:label="الإعدادات" />
+
+</navigation>

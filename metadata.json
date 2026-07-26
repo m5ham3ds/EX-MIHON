@@ -1,0 +1,6 @@
+{
+  "name": "Extension Builder",
+  "description": "App to build Tachiyomi/Mihon extensions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
