@@ -1,4 +1,5 @@
 package com.example.data.repository
+import com.example.core.utils.Resource
 
 import com.example.domain.model.AnalysisResult
 import com.example.domain.model.BuildProgress
@@ -25,21 +26,21 @@ class ProjectRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ProjectRepository {
 
-    override fun analyzeWebsite(url: String): Flow<Result<AnalysisResult>> = flow {
+    override fun analyzeWebsite(url: String): Flow<Resource<AnalysisResult>> = flow {
         try {
             val request = Request.Builder().url(url).build()
             val response = okHttpClient.newCall(request).execute()
             val html = response.body?.string() ?: ""
             if (!response.isSuccessful || html.isEmpty()) {
-                emit(Result.failure(Exception("Failed to fetch HTML")))
+                emit(Resource.Error("Failed to fetch HTML"))
                 return@flow
             }
             
             val analysisResult = compatibilityEngine.analyze(url, html)
             val template = templateEngine.getBestTemplate(analysisResult.detectedTemplateType)
-            emit(Result.success(analysisResult.copy(chosenTemplate = template)))
+            emit(Resource.Success(analysisResult.copy(chosenTemplate = template)))
         } catch (e: Exception) {
-            emit(Result.failure(e))
+            emit(Resource.Error(e.message ?: "Error", e))
         }
     }.flowOn(ioDispatcher)
 
@@ -48,8 +49,8 @@ class ProjectRepositoryImpl @Inject constructor(
         emit(emptyList())
     }
 
-    override suspend fun saveExtensionConfig(config: ExtensionConfig): Result<Unit> {
-        return Result.success(Unit)
+    override suspend fun saveExtensionConfig(config: ExtensionConfig): Resource<Unit> {
+        return Resource.Success(Unit)
     }
 
     override fun buildExtension(config: ExtensionConfig): Flow<BuildProgress> = flow {

@@ -1,41 +1,46 @@
 package com.example.worker
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import androidx.work.ListenableWorker.Result
 import com.example.core.utils.FileUtils
 import com.example.domain.model.BuildStep
 import com.example.domain.model.ExtensionConfig
 import com.example.engine.generator.CodeGenerator
 import com.example.engine.generator.ProjectTreeGenerator
 import com.google.gson.Gson
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 
-@HiltWorker
-class ExtensionBuilderWorker @AssistedInject constructor(
-    @Assisted context: Context,
-    @Assisted workerParams: WorkerParameters,
-    private val projectTreeGenerator: ProjectTreeGenerator,
-    private val codeGenerator: CodeGenerator,
-    private val fileUtils: FileUtils
+class ExtensionBuilderWorker(
+    context: Context,
+    workerParams: WorkerParameters
 ) : CoroutineWorker(context, workerParams) {
 
+
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
+        val entryPoint = EntryPointAccessors.fromApplication(applicationContext, WorkerEntryPoint::class.java)
+        val projectTreeGenerator = entryPoint.projectTreeGenerator()
+        val codeGenerator = entryPoint.codeGenerator()
+        val fileUtils = entryPoint.fileUtils()
+        val gson = entryPoint.gson()
+
         val logBuilder = StringBuilder()
         val startTime = System.currentTimeMillis()
 
         try {
             val configJson = inputData.getString(KEY_CONFIG)
                 ?: return@withContext Result.failure(workDataOf(KEY_ERROR to "لم يتم تمرير الإعدادات"))
-            val config = Gson().fromJson(configJson, ExtensionConfig::class.java)
+            val config = gson.fromJson(configJson, ExtensionConfig::class.java)
 
             reportProgress(BuildStep.VALIDATING_CONFIG, 0, "التحقق من الإعدادات...")
             
@@ -45,9 +50,10 @@ class ExtensionBuilderWorker @AssistedInject constructor(
             reportProgress(BuildStep.GENERATING_SOURCE_CODE, 30, "كتابة ملفات الكود...")
             codeGenerator.generateFromTemplate(config) { progressMsg ->
                 logBuilder.appendLine(progressMsg)
-            }.getOrThrow()
+            }
 
             reportProgress(BuildStep.RUNNING_GRADLE_BUILD, 50, "التحقق من بيئة البناء...")
+            
             // Gradle build simulation for compilation
             
             reportProgress(BuildStep.RUNNING_GRADLE_BUILD, 55, "بدء عملية البناء (قد تستغرق وقتًا)...")
@@ -60,7 +66,6 @@ class ExtensionBuilderWorker @AssistedInject constructor(
                     KEY_DURATION_MS to duration
                 )
             )
-
         } catch (e: CancellationException) {
             Result.failure(workDataOf(KEY_ERROR to "تم الإلغاء"))
         } catch (e: Exception) {

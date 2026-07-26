@@ -22,7 +22,6 @@ class PermissionsViewModel @Inject constructor(
     private val analyzeWebsiteUseCase: AnalyzeWebsiteUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow<AnalysisUiState>(AnalysisUiState.Idle)
     val uiState: StateFlow<AnalysisUiState> = _uiState.asStateFlow()
 
@@ -49,10 +48,10 @@ class PermissionsViewModel @Inject constructor(
                 .onStart { _uiState.value = AnalysisUiState.Loading }
                 .catch { e -> _uiState.value = AnalysisUiState.Error(e.message ?: "خطأ غير متوقع", e) }
                 .collect { result ->
-                    _uiState.value = result.fold(
-                        onSuccess = { AnalysisUiState.Success(it) },
-                        onFailure = { AnalysisUiState.Error(it.message ?: "فشل التحليل", it) }
-                    )
+                    _uiState.value = when (result) {
+                        is com.example.core.utils.Resource.Success -> AnalysisUiState.Success(result.data)
+                        is com.example.core.utils.Resource.Error -> AnalysisUiState.Error(result.message, result.exception)
+                    }
                 }
         }
     }

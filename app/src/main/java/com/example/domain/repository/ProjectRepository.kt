@@ -1,4 +1,5 @@
 package com.example.domain.repository
+import com.example.core.utils.Resource
 
 import com.example.domain.model.AnalysisResult
 import com.example.domain.model.BuildProgress
@@ -7,8 +8,8 @@ import com.example.domain.model.ExtensionTemplate
 import kotlinx.coroutines.flow.Flow
 
 interface ProjectRepository {
-    fun analyzeWebsite(url: String): Flow<Result<AnalysisResult>>
+    fun analyzeWebsite(url: String): Flow<Resource<AnalysisResult>>
     fun getAvailableTemplates(): Flow<List<ExtensionTemplate>>
-    suspend fun saveExtensionConfig(config: ExtensionConfig): Result<Unit>
+    suspend fun saveExtensionConfig(config: ExtensionConfig): Resource<Unit>
     fun buildExtension(config: ExtensionConfig): Flow<BuildProgress>
 }

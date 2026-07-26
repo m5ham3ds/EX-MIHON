@@ -1,5 +1,6 @@
 package com.example.engine.generator
 
+import com.example.core.utils.Resource
 import com.example.core.utils.FileUtils
 import com.example.di.IoDispatcher
 import com.example.domain.model.ExtensionConfig
@@ -19,9 +20,8 @@ class CodeGenerator @Inject constructor(
     suspend fun generateFromTemplate(
         config: ExtensionConfig,
         onProgress: (String) -> Unit
-    ): Result<List<File>> = withContext(ioDispatcher) {
-        runCatching {
-            // Simplified logic for creating the final files
+    ): Resource<List<File>> = withContext(ioDispatcher) {
+        try {
             val generatedFiles = mutableListOf<File>()
             val baseDir = File(config.outputPath, "source")
             val srcDir = File(baseDir, "src/main/kotlin")
@@ -31,7 +31,9 @@ class CodeGenerator @Inject constructor(
             fileUtils.writeTextFile(mainFile.absolutePath, "package ${config.packageName}\n\nclass ${config.siteName} {}")
             generatedFiles.add(mainFile)
             
-            generatedFiles
+            Resource.Success(generatedFiles)
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Error", e)
         }
     }
 }

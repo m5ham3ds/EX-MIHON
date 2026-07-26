@@ -1,5 +1,6 @@
 package com.example.data.remote
 
+import com.example.core.utils.Resource
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -29,8 +30,8 @@ class HuggingFaceApiClient @Inject constructor(
     suspend fun analyzeWebsite(
         token: String,
         request: AnalysisRequest
-    ): Result<AnalysisResponse> = withContext(Dispatchers.IO) {
-        runCatching {
+    ): Resource<AnalysisResponse> = withContext(Dispatchers.IO) {
+        try {
             val prompt = buildAnalysisPrompt(request.html, request.siteUrl)
             val requestBody = gson.toJson(mapOf("inputs" to prompt))
                 .toRequestBody("application/json".toMediaType())
@@ -44,13 +45,15 @@ class HuggingFaceApiClient @Inject constructor(
 
             okHttpClient.newCall(httpRequest).execute().use { response ->
                 when (response.code) {
-                    200 -> AnalysisResponse("Madara", emptyMap(), 0.9f, "OK") // Simplified
+                    200 -> Resource.Success(AnalysisResponse("Madara", emptyMap(), 0.9f, "OK"))
                     401 -> throw AuthenticationException("Token غير صحيح أو منتهي الصلاحية")
                     429 -> throw RateLimitException("تم تجاوز حد الطلبات. انتظر قبل المحاولة")
                     503 -> throw ModelLoadingException("النموذج قيد التحميل. حاول بعد قليل")
                     else -> throw ApiException("خطأ API: ${response.code}")
                 }
             }
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Error", e)
         }
     }
 

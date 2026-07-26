@@ -105,15 +105,12 @@ dependencies {
   implementation("androidx.constraintlayout:constraintlayout:2.2.0")
   implementation("com.google.android.material:material:1.12.0")
   implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
-  implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.8.7")
   implementation("androidx.lifecycle:lifecycle-common-java8:2.8.7")
   implementation("androidx.navigation:navigation-fragment-ktx:2.8.4")
   implementation("androidx.navigation:navigation-ui-ktx:2.8.4")
   
   implementation("com.google.dagger:hilt-android:2.60.1")
   "ksp"("com.google.dagger:hilt-android-compiler:2.60.1")
-  implementation("androidx.hilt:hilt-work:1.2.0")
-  "ksp"("androidx.hilt:hilt-compiler:1.2.0")
   implementation("androidx.hilt:hilt-navigation-fragment:1.2.0")
   
   implementation("androidx.work:work-runtime-ktx:2.10.0")
@@ -144,6 +141,4 @@ dependencies {
   androidTestImplementation(libs.androidx.runner)
   debugImplementation(libs.androidx.compose.ui.test.manifest)
   debugImplementation(libs.androidx.compose.ui.tooling)
-  "ksp"(libs.androidx.room.compiler)
-  "ksp"(libs.moshi.kotlin.codegen)
 }
